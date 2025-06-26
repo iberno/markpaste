@@ -1,39 +1,37 @@
-export function applyMarkdownFormating(text, selectionStart, selectionEnd, action) {
-    const selected = text.slice(selectionStart, selectionEnd)
-    let formatted = selected
+export function applyMarkdownFormatting(text = '', selectionStart = 0, selectionEnd = 0, action) {
+    if (typeof text !== 'string') return ''
+    const selected = text.slice(selectionStart, selectionEnd) || ''
+    let formatted = ''        
     switch (action) {
         case 'bold':
-            formatted = `**${selected || 'negrito'}**`            
+            formatted = `** ${selected || 'negrito'} **`            
             break;
         case 'italic': 
-            formatted = `*${selected || 'itálico'}*`
+            formatted = `* ${selected || 'itálico'}*`
             break
         case 'heading': `# ${selected || 'Título'}`
             break
         case 'list':
-            formatterd = `- ${selected || 'Item de Lista'}`
+            formatted = `- ${selected || 'Item de Lista'}`
             break
         case 'quote':
-            formatterd = `> ${selected || 'Citação'}`
+            formatted = `> ${selected || 'Citação'}`
             break
         case 'code':
-            formatterd = `\`\`\`\n${selected || 'código'}\n\`\`\``
+            formatted = `\`\`\`\n${selected || 'código'}\n\`\`\``
             break
         case 'link':
-            formatterd = `[${selected || 'texto'}](https://)`
+            formatted = `[${selected || 'texto'}](https://)`
             break
         case 'image':
-            formatterd = `[${selected || 'imagem'}](https://)`
+            formatted = `![${selected || 'imagem'}](https://)`
             break
         case 'checklist':
-            formatterd = `- [ ] ${selected || 'Tarefa'}`
+            formatted = `- [ ] ${selected || 'Tarefa'}`
             break 
+            console.log('Ação:', action, '| Texto selecionado:', selected)
         default: 
             return text;
-    }
-    return (
-        text.slice(0, selectionStart) + 
-        formatted +
-        text.slice(selectionEnd)
-    )
+    }  
+        return text.slice(0, selectionStart) + formatted + text.slice(selectionEnd)
 }
