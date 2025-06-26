@@ -1,23 +1,19 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
+import Toolbar from "./components/Toolbar"
+import Editor from "./components/Editor"
 import "./styles/tailwind.css";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  const [content, setContent] = useState('')
+  const handleAction = (action) => {
+    //Aqui será aplicado a formatação no texto
+    console.log('Ação', action)
   }
-
   return (
-    <main className="container">
-      <h1 className="text-black text-3xl">Welcome to Tauri + React</h1>
-
-    
-    </main>
+    <div className="h-screen flex flex-col bg-zinc-950 text-white">
+      <Toolbar onAction={handleAction} />
+      <Editor    content={content} setContent={setContent} />
+    </div>
   );
 }
 
