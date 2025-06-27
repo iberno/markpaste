@@ -4,18 +4,18 @@ export function applyMarkdownFormatting(text = '', selectionStart = 0, selection
     let formatted = ''        
     switch (action) {
         case 'bold':
-            formatted = `** ${selected || 'negrito'} **`            
+            formatted = `**${selected || 'negrito'}**`            
             break;
         case 'italic': 
-            formatted = `* ${selected || 'itálico'}*`
+            formatted = `*${selected || 'itálico'}*`
             break
-        case 'heading': `# ${selected || 'Título'}`
+        case 'heading': `#${selected || 'Título'}`
             break
         case 'list':
-            formatted = `- ${selected || 'Item de Lista'}`
+            formatted = `-${selected || 'Item de Lista'}`
             break
         case 'quote':
-            formatted = `> ${selected || 'Citação'}`
+            formatted = `>${selected || 'Citação'}`
             break
         case 'code':
             formatted = `\`\`\`\n${selected || 'código'}\n\`\`\``
@@ -27,7 +27,7 @@ export function applyMarkdownFormatting(text = '', selectionStart = 0, selection
             formatted = `![${selected || 'imagem'}](https://)`
             break
         case 'checklist':
-            formatted = `- [ ] ${selected || 'Tarefa'}`
+            formatted = `-[ ] ${selected || 'Tarefa'}`
             break 
             console.log('Ação:', action, '| Texto selecionado:', selected)
         default: 
