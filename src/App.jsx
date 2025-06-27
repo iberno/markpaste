@@ -11,6 +11,7 @@ import "./styles/tailwind.css";
 import sampleData from "./database/sampleData.js";
 
 function App() {
+  const [sidebarVisible, setSidebarVisible] = useState(true)
   const [content, setContent] = useState('')
   const textareaRef = useRef(null)
 
@@ -43,17 +44,38 @@ const handleAction = (action) => {
 }
 return (
   <div className="h-screen flex flex-col bg-zinc-950 text-white overflow-hidden">
-    {/* Topbar global */}
+    {/* 🔝 Topbar global com ações: novo, salvar etc */}
     <Topbar onAction={handleAction} />
 
-    {/* Conteúdo */}
+    {/* 🖥️ Área principal: Sidebar + Editor + Preview */}
     <div className="flex flex-1 overflow-hidden">
-      {/* Sidebar */}
-      <Sidebar data={sampleData} onSelect={setContent} />
+      {/* 📁 Sidebar ou aba colapsada */}
+      {sidebarVisible ? (
+        <div className="transition-all duration-700 ease-in-out w-64 bg-zinc-900 border-r border-zinc-800 overflow-hidden">
+          <Sidebar
+            data={sampleData}
+            onSelect={setContent}
+            onCollapse={() => setSidebarVisible(false)}
+          />
+        </div>
+      ) : (
+        <div className="transition-all duration-700 ease-in-out  w-6 bg-zinc-900 border-r border-zinc-800 flex items-start justify-center">
+          <button
+            onClick={() => setSidebarVisible(true)}
+            className="mt-2 text-zinc-400 hover:text-white text-xs"
+            title="Mostrar Sidebar"
+          >
+            📂
+          </button>
+        </div>
+      )}
 
-      {/* Editor + Preview + Toolbar */}
+      {/* Área de edição e preview */}
       <div className="flex flex-col flex-1">
+        {/* 🎨 Toolbar de formatação Markdown */}
         <Toolbar onAction={handleAction} />
+
+        {/* ✍️ Editor | 📄 Preview */}
         <div className="flex flex-1 overflow-hidden border-t border-zinc-800">
           <div className="w-1/2 border-r border-zinc-800">
             <Editor
@@ -69,7 +91,7 @@ return (
       </div>
     </div>
 
-    {/* Footer */}
+    {/* 🔻 Rodapé */}
     <Footer />
   </div>
 )
