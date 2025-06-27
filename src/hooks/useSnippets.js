@@ -52,7 +52,6 @@ export default function useSnippets() {
 
   return { snippets, reload: loadSnippets }
 }
-
   // Recarrega os dados do banco
   async function loadSnippets() {
     const data = await getAllSnippets()
