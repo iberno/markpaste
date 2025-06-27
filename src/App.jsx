@@ -1,24 +1,29 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Topbar from "./components/TopBar.jsx"
 import Toolbar from "./components/Toolbar"
 import Sidebar from "./components/Sidebar";
 import Editor from "./components/Editor"
 import Preview from "./components/Preview";
 import Footer from "./components/Footer.jsx";
-
+//Api
+import { createSnippet } from "./api/snippets.js";
 import { applyMarkdownFormatting } from "./utils/formatMarkdown";
 import "./styles/tailwind.css";
-import sampleData from "./database/sampleData.js";
+//Hooks
+import useSnippets from "./hooks/useSnippets.js"
 
 function App() {
   const [sidebarVisible, setSidebarVisible] = useState(true)
   const [content, setContent] = useState('')
   const textareaRef = useRef(null)
+  const { snippets, reload  } = useSnippets()
 
-const handleAction = (action) => {
+const handleAction = async (action) => {
   switch (action) {
     case 'new':
-      setContent('')
+      await createSnippet({ title: 'Novo Snippet', category: 'Rascunhos', content: '' })
+      await reload()
+      setContent('# Novo Snippet') // opcional: carregar no editor
       break
     case 'save':
       console.log('🚧 Salvar ainda não implementado')
@@ -53,7 +58,7 @@ return (
       {sidebarVisible ? (
         <div className="transition-all duration-700 ease-in-out w-64 bg-zinc-900 border-r border-zinc-800 overflow-hidden">
           <Sidebar
-            data={sampleData}
+            data={snippets}
             onSelect={setContent}
             onCollapse={() => setSidebarVisible(false)}
           />
