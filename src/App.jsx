@@ -1,8 +1,10 @@
 import { useState, useRef } from "react";
-import Sidebar from "./components/Sidebar";
+import Topbar from "./components/TopBar.jsx"
 import Toolbar from "./components/Toolbar"
+import Sidebar from "./components/Sidebar";
 import Editor from "./components/Editor"
 import Preview from "./components/Preview";
+import Footer from "./components/Footer.jsx";
 
 import { applyMarkdownFormatting } from "./utils/formatMarkdown";
 import "./styles/tailwind.css";
@@ -41,28 +43,34 @@ const handleAction = (action) => {
 }
 return (
   <div className="h-screen flex flex-col bg-zinc-950 text-white overflow-hidden">
-    {/* 🔝 Topbar */}
-    <Toolbar onAction={handleAction} />
+    {/* Topbar global */}
+    <Topbar onAction={handleAction} />
 
-    {/* 📄 Conteúdo principal */}
+    {/* Conteúdo */}
     <div className="flex flex-1 overflow-hidden">
-      {/* 📁 Sidebar de Snippets */}
+      {/* Sidebar */}
       <Sidebar data={sampleData} onSelect={setContent} />
 
-      {/* ✍️ Editor + 📄 Preview */}
-      <div className="flex flex-1 overflow-hidden border-l border-zinc-800">
-        <div className="w-1/2 border-r border-zinc-800">
-          <Editor
-            content={content}
-            setContent={setContent}
-            onRefReady={(ref) => (textareaRef.current = ref?.current)}
-          />
-        </div>
-        <div className="w-1/2">
-          <Preview content={content} />
+      {/* Editor + Preview + Toolbar */}
+      <div className="flex flex-col flex-1">
+        <Toolbar onAction={handleAction} />
+        <div className="flex flex-1 overflow-hidden border-t border-zinc-800">
+          <div className="w-1/2 border-r border-zinc-800">
+            <Editor
+              content={content}
+              setContent={setContent}
+              onRefReady={(ref) => (textareaRef.current = ref?.current)}
+            />
+          </div>
+          <div className="w-1/2">
+            <Preview content={content} />
+          </div>
         </div>
       </div>
     </div>
+
+    {/* Footer */}
+    <Footer />
   </div>
 )
 }
