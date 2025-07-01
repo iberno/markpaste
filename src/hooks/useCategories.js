@@ -3,11 +3,11 @@ import {
   createCategory,
   getAllCategories,
   updateCategory,
-  deleteCategory
+  removeCategory
 } from '../services/categories.js'
 
 export default function useCategories() {
-  const [categorias, setCategorias] = useState([])
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -15,9 +15,10 @@ export default function useCategories() {
     setLoading(true)
     try {
       const dados = await getAllCategories()
-      setCategorias(dados)
+      setCategories(dados)
       setError(null)
     } catch (err) {
+      console.error('Erro ao carregar categorias:', err)
       setError(err)
     } finally {
       setLoading(false)
@@ -25,18 +26,33 @@ export default function useCategories() {
   }, [])
 
   const addCategory = async (name) => {
-    await createCategory(name)
-    await carregar()
+    try {
+      await createCategory(name)
+      await carregar()
+    } catch (err) {
+      console.error('Erro ao adicionar categoria:', err)
+      setError(err)
+    }
   }
 
   const editCategory = async (id, name) => {
-    await updateCategory(id, name)
-    await carregar()
+    try {
+      await updateCategory(id, name)
+      await carregar()
+    } catch (err) {
+      console.error('Erro ao editar categoria:', err)
+      setError(err)
+    }
   }
 
   const removeCategory = async (id) => {
-    await deleteCategory(id)
-    await carregar()
+    try {
+      await deleteCategory(id)
+      await carregar()
+    } catch (err) {
+      console.error('Erro ao remover categoria:', err)
+      setError(err)
+    }
   }
 
   useEffect(() => {
@@ -44,7 +60,7 @@ export default function useCategories() {
   }, [carregar])
 
   return {
-    categorias,
+    categories,
     loading,
     error,
     reload: carregar,

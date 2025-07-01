@@ -59,20 +59,47 @@ pub fn get_category(state: State<DbConnection>, id: i64) -> Result<Category, Str
 
 #[tauri::command]
 pub fn update_category(state: State<DbConnection>, id: i64, name: String) -> Result<(), String> {
-    let conn = state.0.lock().map_err(|_| "Erro ao travar conexão")?;
+    println!("🔧 Atualizando categoria ID: {} para '{}'", id, name);
+
+    let conn = state.0.lock().map_err(|e| {
+        let msg = format!("Erro ao travar conexão: {}", e);
+        eprintln!("{}", msg);
+        msg
+    })?;
+
     conn.execute(
         "UPDATE categories SET name = ?1 WHERE id = ?2",
         params![name, id],
-    ).map_err(|e| format!("Erro ao atualizar: {}", e))?;
+    )
+    .map_err(|e| {
+        let msg = format!("Erro ao atualizar categoria: {}", e);
+        eprintln!("{}", msg);
+        msg
+    })?;
+
+    println!("✅ Categoria atualizada com sucesso!");
     Ok(())
 }
+
 
 #[tauri::command]
 pub fn delete_category(state: State<DbConnection>, id: i64) -> Result<(), String> {
     let conn = state.0.lock().map_err(|_| "Erro ao travar conexão")?;
+
+    let count: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM snippets WHERE category_id = ?1",
+        params![id],
+        |row| row.get(0),
+    ).map_err(|e| format!("Erro ao verificar snippets: {}", e))?;
+
+    if count > 0 {
+        return Err(format!("Essa categoria possui {} snippet(s) e não pode ser excluída.", count));
+    }
     conn.execute(
         "DELETE FROM categories WHERE id = ?1",
-        [id],
-    ).map_err(|e| format!("Erro ao deletar: {}", e))?;
+        params![id],
+    ).map_err(|e| format!("Erro ao excluir categoria: {}", e))?;
+
     Ok(())
 }
+
