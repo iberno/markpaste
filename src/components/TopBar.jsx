@@ -1,6 +1,6 @@
 import { FaBars, FaPlus, FaSave, FaFolderOpen, FaFileExport } from 'react-icons/fa'
 
-export default function Topbar({ onAction }) {
+export default function Topbar({ onAction, onNewSnippet }) {
   const buttons = [
     { icon: <FaPlus />, action: 'new', label: 'Novo' },
     { icon: <FaSave />, action: 'save', label: 'Salvar' },

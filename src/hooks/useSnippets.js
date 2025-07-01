@@ -1,73 +1,55 @@
-// src/hooks/useSnippets.js
-import { useEffect, useState } from 'react'
-import { initDatabase } from '../api/db.js'
-import { getAllSnippets } from '../api/snippets.js'
-import { seedDatabase } from '../database/seed.js'
+import { useEffect, useState, useCallback } from 'react'
+import {
+  createSnippet,
+  getAllSnippets,
+  updateSnippet,
+  deleteSnippet
+} from '../services/snippets'
 
 export default function useSnippets() {
   const [snippets, setSnippets] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
-  // Agrupamento por categoria_id e nome da categoria
-  function groupByCategory(data) {
-    const groups = []
-    data.forEach(item => {
-      const existingGroup = groups.find(g => g.id === item.category_id)
-      const snippet = {
-        id: item.id,
-        title: item.title,
-        content: item.content,
-        created_at: item.created_at,
-        category_id: item.category_id,
-      }
-      if (existingGroup) {
-        existingGroup.snippets.push(snippet)
-      } else {
-        groups.push({
-          id: item.category_id,
-          name: item.category || 'Sem categoria',
-          snippets: [snippet],
-        })
-      }
-    })
-    return groups
+  const carregar = useCallback(async () => {
+    setLoading(true)
+    try {
+      const data = await getAllSnippets()
+      setSnippets(data)
+      setError(null)
+    } catch (err) {
+      setError(err)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const addSnippet = async ({ title, content, categoryId }) => {
+    await createSnippet(title, content, categoryId)
+    await carregar()
   }
 
-  async function loadSnippets() {
-    const data = await getAllSnippets()
-    setSnippets(groupByCategory(data))
+  const editSnippet = async ({ id, title, content, categoryId }) => {
+    await updateSnippet(id, title, content, categoryId)
+    await carregar()
+  }
+
+  const removeSnippet = async (id) => {
+    await deleteSnippet(id)
+    await carregar()
   }
 
   useEffect(() => {
-    async function setup() {
-      await initDatabase()
+    carregar()
+  }, [carregar])
 
-      const current = await getAllSnippets()
-      if (current.length === 0) {
-        await seedDatabase()
-      }
-      await loadSnippets()
-    }
-    setup()
-  }, [])
-
-  return { snippets, reload: loadSnippets }
+  return {
+    snippets,
+    loading,
+    error,
+    reload: carregar,
+    addSnippet,
+    editSnippet,
+    removeSnippet
+  }
 }
-  // Recarrega os dados do banco
-  async function loadSnippets() {
-    const data = await getAllSnippets()
-    setSnippets(groupByCategory(data))
-  }
-
-  useEffect(() => {
-    async function setup() {
-      await initDatabase()
-      const current = await getAllSnippets()
-      if (current.length === 0) {
-        await seedDatabase()
-      }
-      await loadSnippets()
-    }
-    setup()
-  }, [])
-
-  return { snippets, reload: loadSnippets }
