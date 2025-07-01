@@ -20,6 +20,8 @@ export default function App() {
   const [content, setContent] = useState('')
   const [selectedSnippet, setSelectedSnippet] = useState(null)
   const textareaRef = useRef(null)
+  const [snippetSelecionado, setSnippetSelecionado] = useState(null)
+  const [draft, setDraft] = useState({ title: '', content: '' })
 
   const {
     categories,
@@ -32,13 +34,23 @@ export default function App() {
     snippets,
     addSnippet,
     editSnippet,
+    removeSnippet,
     reload: reloadSnippets
   } = useSnippets()
 
+  const salvarSnippet = async () => {
+    if (!snippetSelecionado) return
+    await editSnippet(
+      snippetSelecionado.id,
+      draft.title.trim(),
+      draft.content,
+      snippetSelecionado.category_id
+    )
+  }
   const handleAction = async (action) => {
     switch (action) {
       case 'new': {
-        const defaultCategory = 'Rascunhos'
+        const defaultCategory = 'Nova Categoria'
         const existing = categories.find(c => c.name === defaultCategory)
         const categoryId = existing?.id
 
@@ -94,14 +106,16 @@ export default function App() {
             <Sidebar
               categories={categories}
               snippets={snippets}
-              selectedId={selectedSnippet?.id}
+              selectedId={snippetSelecionado?.id}
               onSelect={(snip) => {
-                setSelectedSnippet(snip)
-                setContent(snip.content)
+                setSnippetSelecionado(snip)
+                setDraft({ title: snip.title, content: snip.content })
               }}
-              onDelete={removeCategory}
               onEdit={editCategory}
-              onCollapse={() => setSidebarVisible(false)}
+              onDelete={removeCategory}
+              onCreateSnippet={(catId) => addSnippet('Novo Snippet', '', catId)}
+              onDeleteSnippet={(id) => removeSnippet(id)}
+              onCollapse={() => {}}
             />
           </div>
         ) : (
@@ -115,7 +129,6 @@ export default function App() {
             </button>
           </div>
         )}
-
         <div className="flex flex-col flex-1">
           <Toolbar onAction={handleAction} />
           <div className="flex flex-1 overflow-hidden border-t border-zinc-800">

@@ -3,7 +3,7 @@ import {
   createCategory,
   getAllCategories,
   updateCategory,
-  removeCategory
+  deleteCategory
 } from '../services/categories.js'
 
 export default function useCategories() {
@@ -45,15 +45,27 @@ export default function useCategories() {
     }
   }
 
-  const removeCategory = async (id) => {
-    try {
-      await deleteCategory(id)
-      await carregar()
-    } catch (err) {
-      console.error('Erro ao remover categoria:', err)
+ const removeCategory = async (id) => {
+  try {
+    await deleteCategory(id)         // chama o serviço backend
+    await carregar()                 // recarrega as categorias
+    setError(null)                   // limpa erro anterior (se houver)
+  } catch (err) {
+    console.error('Erro ao remover categoria:', err)
+
+    // Se err for string vinda do backend (como no Rust)
+    if (typeof err === 'string') {
       setError(err)
     }
+
+    // Se for Error JavaScript
+    else if (err?.message) {
+      setError(err.message)
+    } else {
+      setError('Erro inesperado ao remover categoria.')
+    }
   }
+}
 
   useEffect(() => {
     carregar()

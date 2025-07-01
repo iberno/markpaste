@@ -81,7 +81,6 @@ pub fn update_category(state: State<DbConnection>, id: i64, name: String) -> Res
     Ok(())
 }
 
-
 #[tauri::command]
 pub fn delete_category(state: State<DbConnection>, id: i64) -> Result<(), String> {
     let conn = state.0.lock().map_err(|_| "Erro ao travar conexão")?;

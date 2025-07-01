@@ -7,6 +7,19 @@ export default function Topbar({ onAction, onNewSnippet }) {
     { icon: <FaFolderOpen />, action: 'open', label: 'Abrir' },
     { icon: <FaFileExport />, action: 'export', label: 'Exportar' },
   ]
+  const handleTopbarAction = async (action) => {
+    if (action === 'save') {
+      await salvarSnippet()
+    }
+
+    if (action === 'new') {
+      if (categoriaSelecionada) {
+        await addSnippet('Novo Snippet', '', categoriaSelecionada.id)
+      }
+    }
+
+    // em breve: 'export', 'open', etc.
+  }
 
   return (
     <div className="h-12 flex items-center justify-between px-4 border-b border-zinc-800 bg-zinc-900 text-sm">

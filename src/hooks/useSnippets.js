@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from 'react'
 import {
   createSnippet,
-  getAllSnippets,
   updateSnippet,
-  deleteSnippet
-} from '../services/snippets'
+  deleteSnippet,
+  getAllSnippets
+} from '../services/snippets.js'
 
 export default function useSnippets() {
   const [snippets, setSnippets] = useState([])
@@ -14,29 +14,42 @@ export default function useSnippets() {
   const carregar = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await getAllSnippets()
-      setSnippets(data)
+      const lista = await getAllSnippets()
+      setSnippets(lista)
       setError(null)
     } catch (err) {
+      console.error('Erro ao carregar snippets:', err)
       setError(err)
     } finally {
       setLoading(false)
     }
   }, [])
 
-  const addSnippet = async ({ title, content, categoryId }) => {
-    await createSnippet(title, content, categoryId)
-    await carregar()
+  const addSnippet = async (title, category_id) => {
+    try {
+      await createSnippet(title, category_id)
+      await carregar()
+    } catch (err) {
+      setError(err)
+    }
   }
 
-  const editSnippet = async ({ id, title, content, categoryId }) => {
-    await updateSnippet(id, title, content, categoryId)
-    await carregar()
+  const editSnippet = async (id, title, content, category_id) => {
+    try {
+      await updateSnippet(id, title, content, category_id)
+      await carregar()
+    } catch (err) {
+      setError(err)
+    }
   }
 
   const removeSnippet = async (id) => {
-    await deleteSnippet(id)
-    await carregar()
+    try {
+      await deleteSnippet(id)
+      await carregar()
+    } catch (err) {
+      setError(err)
+    }
   }
 
   useEffect(() => {

@@ -16,12 +16,7 @@ export async function updateCategory(id, name) {
   return await invoke('update_category', { id, name })
 }
 
-export const removeCategory = async (id) => {
-  try {
-    await deleteCategory(id)
-    await carregar()
-  } catch (err) {
-    console.error('Erro ao remover categoria:', err)
-    setError(err.message || 'Erro inesperado')
-  }
+// Deleta uma categoria (se estiver vazia)
+export async function deleteCategory(id) {
+  return await invoke('delete_category', { id })
 }

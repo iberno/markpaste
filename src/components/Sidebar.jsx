@@ -3,17 +3,18 @@ import { useState } from 'react'
 export default function Sidebar({
   categories = [],
   snippets = [],
-  onSelect,
   selectedId,
+  onSelect,
   onDelete,
   onEdit,
-  onCollapse
+  onCollapse,
+  onCreateSnippet,
+  onDeleteSnippet
 }) {
-
   const [collapsed, setCollapsed] = useState({})
   const [editingId, setEditingId] = useState(null)
   const [editedName, setEditedName] = useState('')
-  
+
   const toggleCategory = (id) => {
     setCollapsed(prev => ({
       ...prev,
@@ -21,9 +22,12 @@ export default function Sidebar({
     }))
   }
 
+  const snippetsPorCategoria = (catId) =>
+    snippets.filter(snip => snip.category_id === catId)
+
   return (
     <div className="w-64 h-full overflow-y-auto bg-zinc-900 border-r border-zinc-800 transition-all duration-700 ease-in-out">
-      {/* Topo da Sidebar */}
+      {/* Topo */}
       <div className="flex justify-between items-center mb-4 h-12 px-4 border-b border-zinc-800">
         <h2 className="text-sm uppercase font-bold text-zinc-500">Snippets</h2>
         <button
@@ -40,7 +44,7 @@ export default function Sidebar({
       )}
 
       {categories.map(cat => {
-        const related = snippets.filter(s => s.category_id === cat.id)
+        const related = snippetsPorCategoria(cat.id)
         const isCollapsed = collapsed[cat.id]
 
         return (
@@ -48,7 +52,7 @@ export default function Sidebar({
             {/* Cabeçalho da Categoria */}
             <div
               onClick={() => toggleCategory(cat.id)}
-              className="flex items-center justify-between cursor-pointer select-none pr-4"
+              className="flex items-center justify-between cursor-pointer pr-4 select-none"
             >
               {editingId === cat.id ? (
                 <input
@@ -79,29 +83,41 @@ export default function Sidebar({
                     setEditingId(cat.id)
                     setEditedName(cat.name)
                   }}
-                  className="text-sm uppercase font-bold text-zinc-300 cursor-pointer hover:underline"
+                  className="text-sm uppercase font-bold text-zinc-300 hover:underline"
                   title="Duplo clique para editar"
                 >
                   {cat.name}
                 </h3>
               )}
+
               <div className="flex items-center gap-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onCreateSnippet?.(cat.id)
+                  }}
+                  title="Novo snippet"
+                  className="text-green-500 hover:text-green-400 text-xs"
+                >
+                  ➕
+                </button>
+
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
                     onDelete?.(cat.id)
                   }}
                   className="text-red-600 hover:text-red-800 text-xs"
-                  title="Excluir"
+                  title="Excluir categoria"
                 >
                   🗑
                 </button>
               </div>
             </div>
 
-            {/* Lista de Snippets com colapso suave */}
+            {/* Snippets */}
             <div
-              className={`transition-all duration-700 ease-in-out overflow-hidden ${
+              className={`transition-all duration-700 overflow-hidden ${
                 isCollapsed ? 'max-h-0 opacity-0' : 'max-h-96 opacity-100'
               }`}
             >
@@ -109,14 +125,26 @@ export default function Sidebar({
                 {related.map(snip => (
                   <li
                     key={snip.id}
-                    onClick={() => onSelect?.(snip)}
-                    className={`cursor-pointer text-sm px-2 py-1 rounded ${
+                    className={`group flex justify-between items-center text-sm px-2 py-1 rounded ${
                       selectedId === snip.id
                         ? 'bg-blue-600 text-white'
                         : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
                     }`}
+                    onClick={() => onSelect?.(snip)}
                   >
-                    {snip.title}
+                    <span className="truncate">
+                      {snip.title || '📝 (sem título)'}
+                    </span>
+                    <button
+                      title="Excluir snippet"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onDeleteSnippet?.(snip.id)
+                      }}
+                      className="opacity-0 group-hover:opacity-100 text-xs text-red-400 hover:text-red-600"
+                    >
+                      🗑
+                    </button>
                   </li>
                 ))}
               </ul>
